@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인 - GA100</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .auth-container {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 420px;
+            overflow: hidden;
+        }
+
+        .auth-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .auth-header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-header p {
+            opacity: 0.9;
+        }
+
+        .auth-body {
+            padding: 2rem;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 0.75rem;
+            background: #f3f4f6;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: #2563eb;
+            color: #fff;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #6b7280;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            color: #2563eb;
+        }
+
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .message.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .message.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .auth-container {
+                margin: 1rem;
+            }
+
+            .auth-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <h1>GA100</h1>
+            <p>애드센스 수익화 교육 플랫폼</p>
+        </div>
+
+        <div class="auth-body">
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="switchTab('login')">로그인</button>
+                <button class="tab-btn" onclick="switchTab('signup')">회원가입</button>
+            </div>
+
+            <div id="message"></div>
+
+            <!-- 로그인 폼 -->
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginNickname">닉네임</label>
+                    <input type="text" id="loginNickname" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">비밀번호</label>
+                    <input type="password" id="loginPassword" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="submit-btn">로그인</button>
+            </form>
+
+            <!-- 회원가입 폼 -->
+            <form id="signupForm" class="hidden">
+                <div class="form-group">
+                    <label for="signupNickname">닉네임</label>
+                    <input type="text" id="signupNickname" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">비밀번호</label>
+                    <input type="password" id="signupPassword" required autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label for="signupPasswordConfirm">비밀번호 확인</label>
+                    <input type="password" id="signupPasswordConfirm" required autocomplete="new-password">
+                </div>
+                <button type="submit" class="submit-btn">회원가입</button>
+            </form>
+
+            <a href="index.html" class="back-link">← 메인으로 돌아가기</a>
+        </div>
+    </div>
+
+    <script>
+        let currentTab = 'login';
+
+        function switchTab(tab) {
+            currentTab = tab;
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            const tabBtns = document.querySelectorAll('.tab-btn');
+
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+                tabBtns[0].classList.add('active');
+                tabBtns[1].classList.remove('active');
+            } else {
+                loginForm.classList.add('hidden');
+                signupForm.classList.remove('hidden');
+                tabBtns[0].classList.remove('active');
+                tabBtns[1].classList.add('active');
+            }
+            clearMessage();
+        }
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = text;
+        }
+
+        function clearMessage() {
+            document.getElementById('message').className = 'message hidden';
+        }
+
+        // 로그인 처리
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const nickname = document.getElementById('loginNickname').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            const users = JSON.parse(localStorage.getItem('ga100_users') || '[]');
+            const user = users.find(u => u.nickname === nickname && u.password === password);
+
+            if (user) {
+                localStorage.setItem('ga100_currentUser', nickname);
+                showMessage('로그인 성공! 메인 페이지로 이동합니다...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            } else {
+                showMessage('닉네임 또는 비밀번호가 일치하지 않습니다.', 'error');
+            }
+        });
+
+        // 회원가입 처리
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const nickname = document.getElementById('signupNickname').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            const passwordConfirm = document.getElementById('signupPasswordConfirm').value;
+
+            if (password !== passwordConfirm) {
+                showMessage('비밀번호가 일치하지 않습니다.', 'error');
+                return;
+            }
+
+            if (password.length < 4) {
+                showMessage('비밀번호는 4자 이상이어야 합니다.', 'error');
+                return;
+            }
+
+            if (nickname.length < 2) {
+                showMessage('닉네임은 2자 이상이어야 합니다.', 'error');
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('ga100_users') || '[]');
+            
+            // 동일한 닉네임 또는 비밀번호 체크
+            const existingUser = users.find(u => u.nickname === nickname || u.password === password);
+            
+            if (existingUser) {
+                if (existingUser.nickname === nickname && existingUser.password === password) {
+                    showMessage('이미 등록된 사용자입니다. 로그인 해주세요.', 'error');
+                } else {
+                    showMessage('동일한 닉네임 또는 비밀번호가 이미 존재합니다. 다른 것을 사용해주세요.', 'error');
+                }
+                return;
+            }
+
+            // 신규 사용자 등록
+            const newUser = {
+                nickname: nickname,
+                password: password,
+                joinDate: new Date().toISOString(),
+                points: 0,
+                secretQuestions: 0,
+                courses: [],
+                posts: [],
+                comments: []
+            };
+
+            users.push(newUser);
+            localStorage.setItem('ga100_users', JSON.stringify(users));
+            
+            showMessage('회원가입 성공! 로그인 탭으로 이동합니다...', 'success');
+            setTimeout(() => {
+                switchTab('login');
+                document.getElementById('loginNickname').value = nickname;
+            }, 1500);
+        });
+
+        // 이미 로그인된 경우 리다이렉트
+        if (localStorage.getItem('ga100_currentUser')) {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
