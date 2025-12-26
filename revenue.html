@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>수익인증 - GA100</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+            background: #f5f7fa;
+        }
+
+        header {
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #fff;
+            border-radius: 12px;
+            margin-bottom: 3rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .revenue-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .revenue-card {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .revenue-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        .revenue-header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #fff;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .revenue-amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .revenue-date {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .revenue-content {
+            padding: 1.5rem;
+        }
+
+        .revenue-author {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .revenue-comment {
+            color: #374151;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .revenue-tips {
+            background: #f9fafb;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 3px solid #10b981;
+        }
+
+        .revenue-tips h4 {
+            color: #10b981;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .revenue-tips p {
+            color: #6b7280;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .write-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 2rem;
+            background: #10b981;
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .write-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #fff;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .form-group label .required {
+            color: #ef4444;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 0.25rem;
+            color: #6b7280;
+            font-size: 0.85rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            background: #10b981;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 5rem 2rem;
+            color: #6b7280;
+        }
+
+        .empty-state h2 {
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .revenue-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">GA100</a>
+        <button class="btn" style="width: auto; background: #2563eb;" onclick="location.href='myhome.html'">마이홈</button>
+    </header>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>💰 수익 인증</h1>
+            <p>실제 애드센스 수익을 인증하고 노하우를 공유하세요</p>
+        </div>
+
+        <div class="revenue-grid" id="revenueGrid"></div>
+    </div>
+
+    <button class="write-btn" onclick="openModal()">💵 수익 인증하기</button>
+
+    <!-- 수익 인증 모달 -->
+    <div class="modal" id="revenueModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">수익 인증하기</h2>
+                <button class="close-btn" onclick="closeModal()">✕</button>
+            </div>
+            <form id="revenueForm">
+                <div class="form-group">
+                    <label>수익 금액 <span class="required">*</span></label>
+                    <input type="number" id="revenueAmount" required min="0" step="0.01" placeholder="예: 150.50">
+                    <small>달러($) 단위로 입력해주세요</small>
+                </div>
+                <div class="form-group">
+                    <label>기간 <span class="required">*</span></label>
+                    <input type="text" id="revenuePeriod" required placeholder="예: 2024년 12월">
+                </div>
+                <div class="form-group">
+                    <label>간단한 소감 <span class="required">*</span></label>
+                    <textarea id="revenueComment" required placeholder="수익 달성 소감, 느낀 점 등을 자유롭게 작성해주세요"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>수익 창출 주제 (선택)</label>
+                    <input type="text" id="revenueSubject" placeholder="예: 재테크 블로그">
+                    <small>어떤 주제로 수익을 창출했는지 알려주세요</small>
+                </div>
+                <div class="form-group">
+                    <label>노하우/팁 (선택)</label>
+                    <textarea id="revenueTips" placeholder="다른 학습자들에게 도움이 될 만한 노하우나 팁을 공유해주세요"></textarea>
+                </div>
+                <button type="submit" class="btn">인증하기</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 로컬 스토리지 초기화
+        if (!localStorage.getItem('ga100_revenues')) {
+            localStorage.setItem('ga100_revenues', JSON.stringify(defaultRevenues));
+        }
+
+        // 수익 인증 로드
+        function loadRevenues() {
+            const revenues = JSON.parse(localStorage.getItem('ga100_revenues') || '[]');
+            const grid = document.getElementById('revenueGrid');
+
+            if (revenues.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <h2>아직 수익 인증이 없습니다</h2>
+                        <p>첫 번째 수익 인증자가 되어보세요!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = revenues.map(rev => `
+                <div class="revenue-card">
+                    <div class="revenue-header">
+                        <div class="revenue-amount">$${rev.amount.toFixed(2)}</div>
+                        <div class="revenue-date">${rev.period}</div>
+                    </div>
+                    <div class="revenue-content">
+                        <div class="revenue-author">
+                            <span>👤 ${rev.author}</span>
+                            <span>•</span>
+                            <span>📅 ${rev.date}</span>
+                        </div>
+                        ${rev.subject ? `<div style="margin-bottom: 1rem;"><strong>주제:</strong> ${rev.subject}</div>` : ''}
+                        <div class="revenue-comment">${rev.comment}</div>
+                        ${rev.tips ? `
+                            <div class="revenue-tips">
+                                <h4>💡 노하우</h4>
+                                <p>${rev.tips}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 모달 열기
+        function openModal() {
+            const currentUser = localStorage.getItem('ga100_currentUser');
+            
+            if (!currentUser) {
+                alert('로그인이 필요합니다.');
+                location.href = 'login.html';
+                return;
+            }
+
+            document.getElementById('revenueModal').classList.add('active');
+        }
+
+        // 모달 닫기
+        function closeModal() {
+            document.getElementById('revenueModal').classList.remove('active');
+            document.getElementById('revenueForm').reset();
+        }
+
+        // 수익 인증 제출
+        document.getElementById('revenueForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const currentUser = localStorage.getItem('ga100_currentUser');
+            
+            const newRevenue = {
+                id: 'rev' + Date.now(),
+                author: currentUser,
+                amount: parseFloat(document.getElementById('revenueAmount').value),
+                period: document.getElementById('revenuePeriod').value,
+                date: new Date().toISOString().split('T')[0],
+                comment: document.getElementById('revenueComment').value,
+                subject: document.getElementById('revenueSubject').value || '',
+                tips: document.getElementById('revenueTips').value || ''
+            };
+
+            const revenues = JSON.parse(localStorage.getItem('ga100_revenues') || '[]');
+            revenues.unshift(newRevenue);
+            localStorage.setItem('ga100_revenues', JSON.stringify(revenues));
+
+            // 포인트 지급
+            const users = JSON.parse(localStorage.getItem('ga100_users') || '[]');
+            const userIndex = users.findIndex(u => u.nickname === currentUser);
+            
+            if (userIndex !== -1) {
+                users[userIndex].points = (users[userIndex].points || 0) + 100;
+                localStorage.setItem('ga100_users', JSON.stringify(users));
+            }
+
+            alert('수익 인증이 완료되었습니다! 100 포인트가 지급되었습니다.');
+            closeModal();
+            loadRevenues();
+        });
+
+        // 페이지 로드
+        loadRevenues();
+    </script>
+</body>
+</html>
