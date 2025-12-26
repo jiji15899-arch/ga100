@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>커뮤니티 - GA100</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+            background: #f5f7fa;
+        }
+
+        header {
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .tab-menu {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e5e7eb;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #6b7280;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab.active {
+            color: #2563eb;
+            border-bottom-color: #2563eb;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .post-list {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .post-item {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .post-item:hover {
+            background: #f9fafb;
+        }
+
+        .post-item:last-child {
+            border-bottom: none;
+        }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .post-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .post-badge {
+            padding: 0.25rem 0.75rem;
+            background: #dbeafe;
+            color: #1e40af;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .post-badge.notice {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .post-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .write-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .write-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #fff;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6b7280;
+        }
+
+        .subcategory-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .subcategory-tab {
+            padding: 0.5rem 1rem;
+            background: #f3f4f6;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .subcategory-tab.active {
+            background: #2563eb;
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .post-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">GA100</a>
+        <button class="btn" onclick="location.href='myhome.html'">마이홈</button>
+    </header>
+
+    <div class="container">
+        <h1 class="page-title">커뮤니티</h1>
+
+        <div class="tab-menu">
+            <button class="tab active" onclick="switchTab('notice')">공지사항</button>
+            <button class="tab" onclick="switchTab('secret')">시크릿 1:1 질문</button>
+            <button class="tab" onclick="switchTab('student')">제자 커뮤니티</button>
+        </div>
+
+        <!-- 공지사항 -->
+        <div class="tab-content active" id="notice">
+            <div class="post-list" id="noticeList"></div>
+        </div>
+
+        <!-- 시크릿 1:1 질문 -->
+        <div class="tab-content" id="secret">
+            <div class="post-list" id="secretList"></div>
+        </div>
+
+        <!-- 제자 커뮤니티 -->
+        <div class="tab-content" id="student">
+            <div class="subcategory-tabs">
+                <button class="subcategory-tab active" onclick="switchSubTab('knowhow')">제자 노하우</button>
+                <button class="subcategory-tab" onclick="switchSubTab('free')">자유게시판</button>
+                <button class="subcategory-tab" onclick="switchSubTab('qna')">질문/답변</button>
+            </div>
+            <div class="post-list" id="studentList"></div>
+        </div>
+    </div>
+
+    <!-- 글쓰기 버튼 -->
+    <button class="write-btn" onclick="openWriteModal()">✏️</button>
+
+    <!-- 글쓰기 모달 -->
+    <div class="modal" id="writeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">새 글 작성</h2>
+                <button class="close-btn" onclick="closeWriteModal()">✕</button>
+            </div>
+            <form id="writeForm">
+                <div class="form-group">
+                    <label>카테고리</label>
+                    <select id="postCategory" onchange="updateSubcategory()">
+                        <option value="notice">공지사항 (관리자 전용)</option>
+                        <option value="secret">시크릿 1:1 질문</option>
+                        <option value="student">제자 커뮤니티</option>
+                    </select>
+                </div>
+                <div class="form-group" id="subcategoryGroup" style="display: none;">
+                    <label>하위 카테고리</label>
+                    <select id="postSubcategory">
+                        <option value="knowhow">제자 노하우</option>
+                        <option value="free">자유게시판</option>
+                        <option value="qna">질문/답변</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>제목</label>
+                    <input type="text" id="postTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>내용</label>
+                    <textarea id="postContent" required></textarea>
+                </div>
+                <button type="submit" class="btn">작성 완료</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentTab = 'notice';
+        let currentSubTab = 'knowhow';
+
+        // 샘플 게시글 데이터
+        const defaultPosts = [
+            {
+                id: 'post1',
+                category: 'notice',
+                title: '🎉 GA100 플랫폼 오픈을 환영합니다!',
+                content: '애드센스 수익화의 모든 것을 배울 수 있는 GA100이 오픈했습니다.',
+                author: '관리자',
+                date: '2024-12-26',
+                views: 156,
+                comments: 8
+            },
+            {
+                id: 'post2',
+                category: 'student',
+                subcategory: 'knowhow',
+                title: '첫 수익 발생 후기 및 노하우 공유',
+                content: '강의를 듣고 2주 만에 첫 수익이 발생했습니다!',
+                author: '학습왕',
+                date: '2024-12-25',
+                views: 89,
+                comments: 12
+            }
+        ];
+
+        // 로컬 스토리지 초기화
+        if (!localStorage.getItem('ga100_posts')) {
+            localStorage.setItem('ga100_posts', JSON.stringify(defaultPosts));
+        }
+
+        // 탭 전환
+        function switchTab(tabName) {
+            currentTab = tabName;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+
+            loadPosts();
+        }
+
+        // 서브 탭 전환
+        function switchSubTab(subTab) {
+            currentSubTab = subTab;
+            document.querySelectorAll('.subcategory-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            loadPosts();
+        }
+
+        // 게시글 로드
+        function loadPosts() {
+            const posts = JSON.parse(localStorage.getItem('ga100_posts') || '[]');
+            let filteredPosts = posts.filter(p => p.category === currentTab);
+
+            if (currentTab === 'student') {
+                filteredPosts = filteredPosts.filter(p => p.subcategory === currentSubTab);
+            }
+
+            const listId = currentTab === 'notice' ? 'noticeList' : 
+                          currentTab === 'secret' ? 'secretList' : 'studentList';
+            const listElement = document.getElementById(listId);
+
+            if (filteredPosts.length === 0) {
+                listElement.innerHTML = `
+                    <div class="empty-state">
+                        <h3>아직 작성된 글이 없습니다</h3>
+                        <p>첫 번째 글을 작성해보세요!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            listElement.innerHTML = filteredPosts.map(post => `
+                <div class="post-item" onclick="viewPost('${post.id}')">
+                    <div class="post-header">
+                        <div class="post-title">
+                            ${post.category === 'notice' ? '<span class="post-badge notice">공지</span> ' : ''}
+                            ${post.title}
+                        </div>
+                    </div>
+                    <div class="post-meta">
+                        <span>👤 ${post.author}</span>
+                        <span>📅 ${post.date}</span>
+                        <span>👁️ ${post.views}</span>
+                        <span>💬 ${post.comments}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 게시글 상세보기
+        function viewPost(postId) {
+            alert('게시글 상세 페이지는 별도로 구현됩니다.');
+        }
+
+        // 글쓰기 모달 열기
+        function openWriteModal() {
+            const currentUser = localStorage.getItem('ga100_currentUser');
+            
+            if (!currentUser) {
+                alert('로그인이 필요합니다.');
+                location.href = 'login.html';
+                return;
+            }
+
+            // 시크릿 질문은 질문권 확인
+            if (currentTab === 'secret') {
+                const users = JSON.parse(localStorage.getItem('ga100_users') || '[]');
+                const user = users.find(u => u.nickname === currentUser);
+                
+                if (!user || user.secretQuestions === 0) {
+                    alert('시크릿 질문권이 필요합니다. 강의 후기를 작성하거나 커뮤니티 활동으로 질문권을 획득하세요.');
+                    return;
+                }
+            }
+
+            document.getElementById('postCategory').value = currentTab;
+            updateSubcategory();
+            document.getElementById('writeModal').classList.add('active');
+        }
+
+        // 글쓰기 모달 닫기
+        function closeWriteModal() {
+            document.getElementById('writeModal').classList.remove('active');
+            document.getElementById('writeForm').reset();
+        }
+
+        // 서브카테고리 업데이트
+        function updateSubcategory() {
+            const category = document.getElementById('postCategory').value;
+            const subcategoryGroup = document.getElementById('subcategoryGroup');
+            
+            if (category === 'student') {
+                subcategoryGroup.style.display = 'block';
+            } else {
+                subcategoryGroup.style.display = 'none';
+            }
+        }
+
+        // 글 작성 제출
+        document.getElementById('writeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const currentUser = localStorage.getItem('ga100_currentUser');
+            const category = document.getElementById('postCategory').value;
+
+            // 공지사항은 관리자만
+            if (category === 'notice' && !['admin', '관리자', 'ga100admin'].includes(currentUser)) {
+                alert('공지사항은 관리자만 작성할 수 있습니다.');
+                return;
+            }
+
+            const newPost = {
+                id: 'post' + Date.now(),
+                category: category,
+                subcategory: category === 'student' ? document.getElementById('postSubcategory').value : null,
+                title: document.getElementById('postTitle').value,
+                content: document.getElementById('postContent').value,
+                author: currentUser,
+                date: new Date().toISOString().split('T')[0],
+                views: 0,
+                comments: 0
+            };
+
+            const posts = JSON.parse(localStorage.getItem('ga100_posts') || '[]');
+            posts.unshift(newPost);
+            localStorage.setItem('ga100_posts', JSON.stringify(posts));
+
+            // 포인트 지급
+            const users = JSON.parse(localStorage.getItem('ga100_users') || '[]');
+            const userIndex = users.findIndex(u => u.nickname === currentUser);
+            
+            if (userIndex !== -1) {
+                if (category === 'secret') {
+                    users[userIndex].secretQuestions -= 1; // 질문권 차감
+                } else if (category === 'student') {
+                    users[userIndex].secretQuestions += 2; // 게시글 작성 보상
+                }
+                localStorage.setItem('ga100_users', JSON.stringify(users));
+            }
+
+            alert('글이 성공적으로 작성되었습니다!');
+            closeWriteModal();
+            loadPosts();
+        });
+
+        // URL 파라미터로 탭 전환
+        const urlParams = new URLSearchParams(window.location.search);
+        const tab = urlParams.get('tab');
+        if (tab && ['notice', 'secret', 'student'].includes(tab)) {
+            currentTab = tab;
+            document.querySelectorAll('.tab').forEach((t, i) => {
+                const tabs = ['notice', 'secret', 'student'];
+                if (tabs[i] === tab) {
+                    t.classList.add('active');
+                    document.querySelectorAll('.tab-content')[i].classList.add('active');
+                } else {
+                    t.classList.remove('active');
+                }
+            });
+        }
+
+        // 페이지 로드
+        loadPosts();
+    </script>
+</body>
+  </html>
