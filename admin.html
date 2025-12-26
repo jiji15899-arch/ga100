@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 대시보드 - GA100</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+            background: #f5f7fa;
+        }
+
+        header {
+            background: #1f2937;
+            color: #fff;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #60a5fa;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+            color: #fff;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .stat-card h3 {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #1f2937;
+        }
+
+        .tab-menu {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #e5e7eb;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #6b7280;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab.active {
+            color: #2563eb;
+            border-bottom-color: #2563eb;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            text-align: left;
+            padding: 0.75rem;
+            background: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .table tr:hover {
+            background: #f9fafb;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge.active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge.blocked {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge.online {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin: 0 0.25rem;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: #fff;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: #fff;
+        }
+
+        .activity-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-info {
+            flex: 1;
+        }
+
+        .activity-user {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-action {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .activity-time {
+            font-size: 0.85rem;
+            color: #9ca3af;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6b7280;
+        }
+
+        @media (max-width: 768px) {
+            .stat-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">🔧 GA100 관리자</div>
+        <div>
+            <button class="btn btn-primary" onclick="location.href='index.html'">사이트로 돌아가기</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="dashboard-header">
+            <h1>관리자 대시보드</h1>
+            <p>플랫폼 전체 통계 및 사용자 관리</p>
+        </div>
+
+        <!-- 통계 카드 -->
+        <div class="stat-grid">
+            <div class="stat-card">
+                <h3>전체 사용자</h3>
+                <div class="value" id="totalUsers">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>활성 사용자 (오늘)</h3>
+                <div class="value" id="activeUsers">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>전체 강의</h3>
+                <div class="value" id="totalCourses">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>전체 게시글</h3>
+                <div class="value" id="totalPosts">0</div>
+            </div>
+        </div>
+
+        <!-- 관리 섹션 -->
+        <div class="section">
+            <div class="tab-menu">
+                <button class="tab active" onclick="switchTab('users')">사용자 관리</button>
+                <button class="tab" onclick="switchTab('blacklist')">블랙리스트</button>
+                <button class="tab" onclick="switchTab('activity')">실시간 활동</button>
+                <button class="tab" onclick="switchTab('security')">보안 로그</button>
+            </div>
+
+            <!-- 사용자 관리 -->
+            <div class="tab-content active" id="users">
+                <h2 class="section-title">사용자 목록</h2>
+                <div style="overflow-x: auto;">
+                    <table class="table" id="userTable">
+                        <thead>
+                            <tr>
+                                <th>닉네임</th>
+                                <th>가입일</th>
+                                <th>포인트</th>
+                                <th>질문권</th>
+                                <th>수강 강의</th>
+                                <th>상태</th>
+                                <th>관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 블랙리스트 -->
+            <div class="tab-content" id="blacklist">
+                <h2 class="section-title">블랙리스트</h2>
+                <div style="overflow-x: auto;">
+                    <table class="table" id="blacklistTable">
+                        <thead>
+                            <tr>
+                                <th>닉네임</th>
+                                <th>차단 사유</th>
+                                <th>차단 일시</th>
+                                <th>해제 예정</th>
+                                <th>관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="blacklistTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 실시간 활동 -->
+            <div class="tab-content" id="activity">
+                <h2 class="section-title">실시간 사용자 활동</h2>
+                <div class="activity-list" id="activityList"></div>
+            </div>
+
+            <!-- 보안 로그 -->
+            <div class="tab-content" id="security">
+                <h2 class="section-title">보안 로그</h2>
+                <div class="activity-list" id="securityLog"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 관리자 권한 체크
+        const currentUser = localStorage.getItem('ga100_currentUser');
+        const adminUsers = ['admin', '관리자', 'ga100admin'];
+
+        if (!adminUsers.includes(currentUser)) {
+            alert('관리자 권한이 필요합니다.');
+            location.href = 'index.html';
+        }
+
+        // 블랙리스트 초기화
+        if (!localStorage.getItem('ga100_blacklist')) {
+            localStorage.setItem('ga100_blacklist', JSON.stringify([]));
+        }
+
+        // 활동 로그 초기화
+        if (!localStorage.getItem('ga100_activities')) {
+            localStorage.setItem('ga100_activities', JSON.stringify([]));
+        }
+
+        // 보안 로그 초기화
+        if (!localStorage.getItem('ga100_security_log')) {
+            localStorage.setItem('ga100_security_log', JSON.stringify([]));
+        }
+
+        // 통계 로드
+        function loadStats() {
+            const users = JSON.parse(localStorage.getItem('ga100_users') || '[]');
+            const courses = JSON.parse(localStorage.getItem('ga100_courses') || '[]');
+            const posts = JSON.parse(localStorage.getItem('ga100_posts') || '[]');
+
+            document.getElementById('totalUsers').textContent = users.length;
+            document.getElementById('activeUsers').textContent = users.filter(u => {
+                const lastActive = u.lastActive ? new Date(u.lastActive) : null;
+                const today = new Date();
+                return lastActive && lastActive.toDateString() === today.toDateString();
+            }).length;
+            document.getElementById('totalCourses').textContent = courses.length;
+            document.getElementById('totalPosts').textContent = posts.length;
+        }
+
+        // 사용자 목록 로드
+        function loadUsers() {
+            const users = JSON.parse(localStorage.getItem('ga100_users') || '[]');
+            const tbody = document.getElementById('userTableBody');
+
+            if (users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state">등록된 사용자가 없습니다</div></td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = users.map((user, index) => `
+                <tr>
+                    <td>${user.nickname}</td>
+                    <td>${user.joinDate || 'N/A'}</td>
+                    <td>${user.points || 0}</td>
+                    <td>${user.secretQuestions || 0}</td>
+                    <td>${user.courses ? user.courses.length : 0}</td>
+                    <td><span class="badge active">활성</span></td>
+                    <td>
+                        <button class="btn btn-danger" onclick="blockUser(${index})">차단</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 블랙리스트 로드
+        function loadBlacklist() {
+            const blacklist = JSON.parse(localStorage.getItem('ga100_blacklist') || '[]');
+            const tbody = document.getElementById('blacklistTableBody');
+
+            if (blacklist.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state">차단된 사용자가 없습니다</div></td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = blacklist.map((item, index) => {
+                const unblockDate = new Date(item.blockedDate);
+                unblockDate.setDate(unblockDate.getDate() + 30);
+                
+                return `
+                    <tr>
+                        <td>${item.nickname}</td>
+                        <td>${item.reason}</td>
+                        <td>${item.blockedDate}</td>
+                        <td>${unblockDate.toISOString().split('T')[0]}</td>
+                        <td>
+                            <button class="btn btn-success" onclick="unblockUser(${index})">해제</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 실시간 활동 로드
+        function loadActivities() {
+            const activities = JSON.parse(localStorage.getItem('ga100_activities') || '[]');
+            const list = document.getElementById('activityList');
+
+            if (activities.length === 0) {
+                list.innerHTML = '<div class="empty-state">최근 활동이 없습니다</div>';
+                return;
+            }
+
+            list.innerHTML = activities.slice(0, 20).map(activity => `
+                <div class="activity-item">
+                    <div class="activity-info">
+                        <div class="activity-user">${activity.user}</div>
+                        <div class="activity-action">${activity.action}</div>
+                    </div>
+                    <div class="activity-time">${activity.time}</div>
+                </div>
+            `).join('');
+        }
+
+        // 보안 로그 로드
+        function loadSecurityLog() {
+            const logs = JSON.parse(localStorage.getItem('ga100_security_log') || '[]');
+            const list = document.getElementById('securityLog');
+
+            if (logs.length === 0) {
+                list.innerHTML = '<div class="empty-state">보안 이벤트가 없습니다</div>';
+                return;
+            }
+
+            list.innerHTML = logs.slice(0, 20).map(log => `
+                <div class="activity-item">
+                    <div class="activity-info">
+                        <div class="activity-user">${log.user}</div>
+                        <div class="activity-action" style="color: #ef4444;">${log.event}</div>
+                    </div>
+                    <div class="activity-time">${log.time}</div>
+                </div>
+            `).join('');
+        }
+
+        // 사용자 차단
+        function blockUser(index) {
+            if (!confirm('이 사용자를 차단하시겠습니까? (30일간 이용 금지)')) return;
+
+            const users = JSON.parse(localStorage.getItem('ga100_users') || '[]');
+            const user = users[index];
+            const reason = prompt('차단 사유를 입력하세요:');
+
+            if (!reason) return;
+
+            const blacklist = JSON.parse(localStorage.getItem('ga100_blacklist') || '[]');
+            blacklist.push({
+                nickname: user.nickname,
+                reason: reason,
+                blockedDate: new Date().toISOString().split('T')[0]
+            });
+
+            localStorage.setItem('ga100_blacklist', JSON.stringify(blacklist));
+            alert('사용자가 차단되었습니다.');
+            loadBlacklist();
+        }
+
+        // 사용자 차단 해제
+        function unblockUser(index) {
+            if (!confirm('이 사용자의 차단을 해제하시겠습니까?')) return;
+
+            const blacklist = JSON.parse(localStorage.getItem('ga100_blacklist') || '[]');
+            blacklist.splice(index, 1);
+            localStorage.setItem('ga100_blacklist', JSON.stringify(blacklist));
+
+            alert('차단이 해제되었습니다.');
+            loadBlacklist();
+        }
+
+        // 탭 전환
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+
+            if (tabName === 'users') loadUsers();
+            if (tabName === 'blacklist') loadBlacklist();
+            if (tabName === 'activity') loadActivities();
+            if (tabName === 'security') loadSecurityLog();
+        }
+
+        // 페이지 로드
+        loadStats();
+        loadUsers();
+
+        // 자동 새로고침 (30초마다)
+        setInterval(() => {
+            loadStats();
+            const activeTab = document.querySelector('.tab.active');
+            if (activeTab) {
+                const tabText = activeTab.textContent;
+                if (tabText.includes('실시간')) loadActivities();
+                if (tabText.includes('보안')) loadSecurityLog();
+            }
+        }, 30000);
+    </script>
+</body>
+  </html>
