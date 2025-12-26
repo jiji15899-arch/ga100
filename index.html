@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GA100 - 애드센스 수익화 교육 플랫폼</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        /* 헤더 */
+        header {
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .notification-btn {
+            position: relative;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .notification-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: #ef4444;
+            border-radius: 50%;
+            display: none;
+        }
+
+        .notification-dot.active {
+            display: block;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        /* 사이드바 */
+        .sidebar {
+            position: fixed;
+            right: -320px;
+            top: 0;
+            width: 320px;
+            height: 100vh;
+            background: #fff;
+            box-shadow: -2px 0 12px rgba(0,0,0,0.15);
+            transition: right 0.3s;
+            z-index: 200;
+            overflow-y: auto;
+        }
+
+        .sidebar.active {
+            right: 0;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .sidebar-section {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .sidebar-section h3 {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .sidebar-link {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: #374151;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            transition: background 0.2s;
+        }
+
+        .sidebar-link:hover {
+            background: #f3f4f6;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-btn.secondary {
+            background: #fff;
+            color: #2563eb;
+            border: 1px solid #2563eb;
+        }
+
+        /* 오버레이 */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 150;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* 메인 컨텐츠 */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .cta-btn {
+            padding: 1rem 2rem;
+            background: #fff;
+            color: #667eea;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        /* 섹션 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+
+        .card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: #2563eb;
+        }
+
+        .card p {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        /* 푸터 */
+        footer {
+            background: #1f2937;
+            color: #fff;
+            padding: 2rem;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h4 {
+            margin-bottom: 1rem;
+            color: #60a5fa;
+        }
+
+        .footer-link {
+            display: block;
+            color: #d1d5db;
+            text-decoration: none;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-link:hover {
+            color: #fff;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #374151;
+            color: #9ca3af;
+        }
+
+        /* 알림 패널 */
+        .notification-panel {
+            position: fixed;
+            top: 70px;
+            right: -320px;
+            width: 320px;
+            background: #fff;
+            box-shadow: -2px 2px 12px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            transition: right 0.3s;
+            z-index: 180;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-panel.active {
+            right: 20px;
+        }
+
+        .notification-header {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            font-weight: 600;
+        }
+
+        .notification-item {
+            padding: 1rem;
+            border-bottom: 1px solid #f3f4f6;
+            cursor: pointer;
+        }
+
+        .notification-item:hover {
+            background: #f9fafb;
+        }
+
+        .notification-item .title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .notification-item .time {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .sidebar {
+                width: 280px;
+                right: -280px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <header>
+        <div class="header-container">
+            <a href="#" class="logo">GA100</a>
+            <div class="header-right">
+                <button class="notification-btn" onclick="toggleNotifications()">
+                    🔔
+                    <span class="notification-dot" id="notificationDot"></span>
+                </button>
+                <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 알림 패널 -->
+    <div class="notification-panel" id="notificationPanel">
+        <div class="notification-header">알림</div>
+        <div class="notification-item">
+            <div class="title">새로운 공지사항</div>
+            <div class="time">5분 전</div>
+        </div>
+        <div class="notification-item">
+            <div class="title">댓글이 달렸습니다</div>
+            <div class="time">1시간 전</div>
+        </div>
+    </div>
+
+    <!-- 사이드바 -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>메뉴</h2>
+            <button class="close-btn" onclick="toggleSidebar()">✕</button>
+        </div>
+        
+        <div class="sidebar-section">
+            <button class="auth-btn" onclick="location.href='login.html'">로그인</button>
+            <button class="auth-btn secondary" onclick="location.href='login.html'">회원가입</button>
+        </div>
+
+        <div class="sidebar-section">
+            <h3>강의</h3>
+            <a href="courses.html" class="sidebar-link">올인원 전자책</a>
+            <a href="extend.html" class="sidebar-link">전자책 수강 기간 연장</a>
+            <a href="courses.html" class="sidebar-link">모든 강의 보기</a>
+        </div>
+
+        <div class="sidebar-section">
+            <h3>커뮤니티</h3>
+            <a href="community.html?tab=notice" class="sidebar-link">공지</a>
+            <a href="community.html?tab=secret" class="sidebar-link">시크릿 1:1 질문</a>
+            <a href="community.html?tab=student" class="sidebar-link">제자 커뮤니티</a>
+        </div>
+
+        <div class="sidebar-section">
+            <h3>프로그램</h3>
+            <a href="ai-writing.html" class="sidebar-link">AI 글쓰기</a>
+        </div>
+    </div>
+
+    <!-- 오버레이 -->
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- 히어로 섹션 -->
+    <section class="hero">
+        <h1>애드센스 수익화의 모든 것</h1>
+        <p>초보자도 쉽게 따라할 수 있는 체계적인 애드센스 교육 프로그램</p>
+        <a href="courses.html" class="cta-btn">강의 둘러보기</a>
+    </section>
+
+    <!-- 메인 컨텐츠 -->
+    <div class="container">
+        <h2 class="section-title">인기 강의</h2>
+        <div class="card-grid">
+            <div class="card">
+                <h3>애드센스 승인 완벽 가이드</h3>
+                <p>애드센스 승인을 받기 위한 필수 조건과 실전 노하우를 상세히 알려드립니다.</p>
+            </div>
+            <div class="card">
+                <h3>수익 최적화 전략</h3>
+                <p>광고 배치, 콘텐츠 전략, SEO 최적화를 통한 수익 극대화 방법</p>
+            </div>
+            <div class="card">
+                <h3>실전 사례 분석</h3>
+                <p>실제 수익 인증과 함께하는 성공 사례 분석 및 노하우 공유</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">최근 수익 인증</h2>
+        <div class="card-grid">
+            <div class="card">
+                <h3>월 $500 달성!</h3>
+                <p>3개월 만에 애드센스 월 수익 $500을 달성한 실전 후기입니다...</p>
+            </div>
+            <div class="card">
+                <h3>첫 수익 발생</h3>
+                <p>강의를 듣고 2주 만에 첫 수익이 발생했습니다. 정말 감사합니다!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 푸터 -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>마이홈</h4>
+                <a href="myhome.html?tab=class" class="footer-link">내 클래스</a>
+                <a href="myhome.html?tab=earnings" class="footer-link">내 수익 현황</a>
+                <a href="myhome.html?tab=secret" class="footer-link">시크릿 질문</a>
+                <a href="myhome.html?tab=profile" class="footer-link">내 정보 수정</a>
+            </div>
+            <div class="footer-section">
+                <h4>커뮤니티</h4>
+                <a href="revenue.html" class="footer-link">수익인증</a>
+                <a href="courses.html" class="footer-link">전자책</a>
+                <a href="community.html" class="footer-link">커뮤니티</a>
+            </div>
+            <div class="footer-section">
+                <h4>고객지원</h4>
+                <a href="community.html?tab=secret" class="footer-link">1:1 문의</a>
+                <a href="community.html?tab=notice" class="footer-link">공지사항</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 GA100. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // 로컬 스토리지 초기화
+        if (!localStorage.getItem('ga100_users')) {
+            localStorage.setItem('ga100_users', JSON.stringify([]));
+        }
+        if (!localStorage.getItem('ga100_notifications')) {
+            localStorage.setItem('ga100_notifications', JSON.stringify([
+                {id: 1, title: '새로운 공지사항', time: '5분 전', read: false},
+                {id: 2, title: '댓글이 달렸습니다', time: '1시간 전', read: false}
+            ]));
+        }
+
+        // 사이드바 토글
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
+        // 알림 토글
+        function toggleNotifications() {
+            document.getElementById('notificationPanel').classList.toggle('active');
+            checkNotifications();
+        }
+
+        // 알림 확인
+        function checkNotifications() {
+            const notifications = JSON.parse(localStorage.getItem('ga100_notifications') || '[]');
+            const hasUnread = notifications.some(n => !n.read);
+            if (hasUnread) {
+                document.getElementById('notificationDot').classList.add('active');
+            }
+        }
+
+        // 페이지 로드 시 알림 확인
+        window.addEventListener('load', checkNotifications);
+
+        // 로그인 상태 확인
+        const currentUser = localStorage.getItem('ga100_currentUser');
+        if (currentUser) {
+            const authSection = document.querySelector('.sidebar-section');
+            authSection.innerHTML = `
+                <div style="padding: 1rem; background: #f3f4f6; border-radius: 8px; margin-bottom: 1rem;">
+                    <div style="font-weight: 600; margin-bottom: 0.5rem;">환영합니다!</div>
+                    <div style="color: #2563eb;">${currentUser}</div>
+                </div>
+                <button class="auth-btn" onclick="logout()">로그아웃</button>
+            `;
+        }
+
+        function logout() {
+            localStorage.removeItem('ga100_currentUser');
+            location.reload();
+        }
+    </script>
+</body>
+</html>
